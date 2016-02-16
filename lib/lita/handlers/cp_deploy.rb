@@ -40,12 +40,19 @@ module Lita
               },
               comment: "#{response.user.name} through #{robot.name} deploy"
             })
-          elsif deploy_item['type'] == 'http_get'
-            http_response = http.get "#{deploy_item['TriggerURL']}"
-            if http_response.status == 200
-              response.reply('200 OK')
+          elsif deploy_item['type'] == 'jenkins'
+            uri = URI(deploy_item['TriggerURL'])
+
+            req = Net::HTTP::Get.new(uri)
+            req.basic_auth deploy_item['user'], deploy_item['password']
+
+            res = Net::HTTP.start(uri.hostname, uri.port) {|http|
+              http.request(req)
+            }
+            if res.code == "201"
+              response.reply('201 OK')
             else
-              response.reply(http_response.status)
+              response.reply("Error: #{res.code}")
             end
           else
             response.reply('Error: item type only ["aws", "http_get"]')

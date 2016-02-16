@@ -1,10 +1,10 @@
 Gem::Specification.new do |spec|
   spec.name          = "lita-cp-deploy"
-  spec.version       = "0.1.1"
+  spec.version       = "0.1.2"
   spec.authors       = ["Sammy Lin"]
   spec.email         = ["sammylintw@gmail.com"]
-  spec.description   = "run opsworks or http_get deploy"
-  spec.summary       = "run opsworks or http_get deploy"
+  spec.description   = "run opsworks or jenkins deploy"
+  spec.summary       = "run opsworks or jenkins deploy"
   spec.homepage      = "https://github.com/commandp/lita-cp-deploy"
   spec.license       = "MIT"
   spec.metadata      = { "lita_plugin_type" => "handler" }
