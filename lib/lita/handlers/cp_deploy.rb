@@ -36,7 +36,7 @@ module Lita
               app_id: deploy_item['app_id'],
               command: {
                 name: 'deploy',
-                args: { 'migrate' => ['true'], }
+                args: { 'migrate' => ['true'] }
               },
               comment: "#{response.user.name} through #{robot.name} deploy"
             })
