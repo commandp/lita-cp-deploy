@@ -2,11 +2,11 @@ module Lita
   module Handlers
     class CpDeploy < Handler
       route(
-        %r{deploy\s((\w|\s)+)},
+        %r{deploy\s((?:\s*\w+)+)(?:\s+revision\=([\w\/\_\-]+))?$},
         :deploy,
         :command => true,
         :help    => {
-          'deploy (short_name)' => 'Start deploy'
+          'deploy (short_name) or deploy <short_name> revision=<revision>' => 'Start deploy'
         }
       ) 
 
@@ -20,10 +20,10 @@ module Lita
       ) 
 
       def deploy(response)
-        response.reply(deploy_config)
+        brunch = response.matches.flatten[1]
+
         if deploy_item = find_by_deploy_item(response.matches.flatten[0])
-          response.reply(":running_dog: 開始執行 #{deploy_item['name']} 的佈署...")
-          
+
           if deploy_item['type'] == 'aws'
             opsworks = Aws::OpsWorks::Client.new(
               region: ENV['AWS_REGION'],
@@ -40,8 +40,12 @@ module Lita
               },
               comment: "#{response.user.name} through #{robot.name} deploy"
             })
+            response.reply(":running_dog: 開始執行 #{deploy_item['name']} 的佈署...")
           elsif deploy_item['type'] == 'jenkins'
-            uri = URI(deploy_item['TriggerURL'])
+            trigger_url = deploy_item['TriggerURL']
+            trigger_url += "&REVISION=#{brunch}" if brunch
+
+            uri = URI(trigger_url)
 
             req = Net::HTTP::Get.new(uri)
             req.basic_auth deploy_item['user'], deploy_item['password']
@@ -50,7 +54,7 @@ module Lita
               http.request(req)
             }
             if res.code == "201"
-              response.reply('201 OK')
+              response.reply(":running_dog: 開始執行 #{deploy_item['name']} 的佈署...#{brunch}")
             else
               response.reply("Error: #{res.code}")
             end

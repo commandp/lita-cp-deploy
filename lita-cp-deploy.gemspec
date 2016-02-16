@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "lita-cp-deploy"
-  spec.version       = "0.1.2"
+  spec.version       = "0.1.3"
   spec.authors       = ["Sammy Lin"]
   spec.email         = ["sammylintw@gmail.com"]
   spec.description   = "run opsworks or jenkins deploy"

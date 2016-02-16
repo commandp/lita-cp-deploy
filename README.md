@@ -33,4 +33,22 @@ DEPLOY_CONFIG= '{
     "TriggerURL": "http://jenkins/job/run_deploy/buildWithParameters?token=xxx&cause=xxx"
   } 
 }'
-  ```
+```
+
+```
+lita deploy <short_name>
+
+or
+
+lita deploy <short_name> revision=develop
+```
+
+## chef-client deploy specially revision with jenkins
+
+Enter job configure > This build is parameterized
+
+![jenkins_parameterized](docs/jenkins_parameterized.png?raw=true "Title")
+
+setting shell script
+
+![jenkins_parameterized_2](docs/jenkins_parameterized_2.png?raw=true "Title")
