@@ -35,13 +35,13 @@ module Lita
               stack_id: deploy_item['stack_id'],
               app_id: deploy_item['app_id'],
               command: {
-                name: "deploy",
-                args: { "migrate" => ["true"], }
+                name: 'deploy',
+                args: { 'migrate' => ['true'], }
               },
               comment: "#{response.user.name} through #{robot.name} deploy"
             })
           else
-            response.reply("Error: item type only ['aws']")
+            response.reply('Error: item type only ["aws"]')
           end
         end
       end
@@ -49,7 +49,7 @@ module Lita
       def deploy_help(response)
         str = []
         deploy_config['deploy_itams'].each do |item|
-          str << "deploy #{item['short_name']} => #{item['name']}\"
+          str << "deploy #{item['short_name']} => #{item['name']}\n"
         end
         response.reply(str.join)
       end
