@@ -49,7 +49,7 @@ module Lita
       def deploy_help(response)
         str = []
         deploy_config['deploy_itams'].each do |item|
-          str << "deploy #{item['short_name']} => #{item['name']}\n'"
+          str << "deploy #{item['short_name']} => #{item['name']}\"
         end
         response.reply(str.join)
       end
