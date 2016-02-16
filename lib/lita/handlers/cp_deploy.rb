@@ -22,7 +22,7 @@ module Lita
       def deploy(response)
         response.reply(deploy_config)
         if deploy_item = find_by_deploy_item(response.matches.flatten[0])
-          response.reply("Hi :running_dog: 開始執行 #{deploy_item['name']} 的佈署...")
+          response.reply(":running_dog: 開始執行 #{deploy_item['name']} 的佈署...")
           
           if deploy_item['type'] == 'aws'
             opsworks = Aws::OpsWorks::Client.new(
@@ -40,8 +40,15 @@ module Lita
               },
               comment: "#{response.user.name} through #{robot.name} deploy"
             })
+          elsif deploy_item['type'] == 'http_get'
+            http_response = http.get "#{deploy_item['TriggerURL']}"
+            if http_response.status == 200
+              response.reply('200 OK')
+            else
+              response.reply(http_response.status)
+            end
           else
-            response.reply('Error: item type only ["aws"]')
+            response.reply('Error: item type only ["aws", "http_get"]')
           end
         end
       end

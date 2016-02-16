@@ -1,6 +1,6 @@
 # lita-cp-deploy
 
-可以透過 lita 執行 opswork
+可以透過 lita 執行 opswork or http get
 
 ## Installation
 
@@ -23,6 +23,12 @@ DEPLOY_CONFIG= '{
     "type": "aws", 
     "stack_id": "xxx",
     "app_id": "xxx"
+   }, 
+   {
+    "name": "Jenkins Staging API",
+    "short_name": "c stg api", 
+    "type": "http_get", 
+    "TriggerURL": "http://jenkins.dev/job/run_deploy/buildWithParameters?token=xxx"
    }]
 }'
 ```
