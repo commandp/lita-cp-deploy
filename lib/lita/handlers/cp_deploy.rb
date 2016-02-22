@@ -2,13 +2,13 @@ module Lita
   module Handlers
     class CpDeploy < Handler
       route(
-        %r{deploy\s((?:\s*\w+)+)(?:\s+revision\=([\w\/\_\-]+))?$},
+        %r{deploy\s((?:\s*\w+)+)(?:\s+revision\=([\w\/\_\-\.]+))?$},
         :deploy,
         :command => true,
         :help    => {
           'deploy (short_name) or deploy <short_name> revision=<revision>' => 'Start deploy'
         }
-      ) 
+      )
 
       route(
         %r{deploy\shelp},
@@ -17,7 +17,7 @@ module Lita
         :help    => {
           'deploy help' => '顯示有什麼可以 deploy 的 '
         }
-      ) 
+      )
 
       def deploy(response)
         brunch = response.matches.flatten[1]
@@ -77,7 +77,7 @@ module Lita
       def find_by_deploy_item(short_name)
         deploy_config['deploy_itams'].select {|key| key['short_name'] == short_name }.first
       end
-      
+
       def deploy_config
         JSON.parse(ENV['DEPLOY_CONFIG'])
       end
