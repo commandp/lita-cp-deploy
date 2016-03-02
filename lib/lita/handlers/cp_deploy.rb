@@ -2,11 +2,13 @@ module Lita
   module Handlers
     class CpDeploy < Handler
       route(
-        %r{deploy\s((?:\s*\w+)+)(?:\s+revision\=([\w\/\_\-\.]+))?$},
+        %r{deploy\s((?:\s*\w+)+)(?:\s+(?:revision|r)\=([\w\/\_\-\.]+))?$},
         :deploy,
         :command => true,
         :help    => {
-          'deploy (short_name) or deploy <short_name> revision=<revision>' => 'Start deploy'
+          'deploy (short_name)' => 'Start deploy',
+          'deploy <short_name> revision=<revision>' => 'Start deploy a specific revision',
+          'deploy <short_name> r=<revision>' => 'Start deploy a specific revision (short)'
         }
       )
 
@@ -31,6 +33,13 @@ module Lita
               secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
             )
 
+            custom_json = nil
+            if brunch
+              app_name = opsworks.describe_apps(app_ids: [deploy_item['app_id']])[0][0].shortname
+              custom_json = "{\"deploy\":{\"#{app_name}\":{\"scm\":{\"revision\":\"#{brunch}\"}}}}"
+              custom_json = JSON.parse(custom_json)
+            end
+
             resp = opsworks.create_deployment({
               stack_id: deploy_item['stack_id'],
               app_id: deploy_item['app_id'],
@@ -38,7 +47,8 @@ module Lita
                 name: 'deploy',
                 args: { 'migrate' => ['true'] }
               },
-              comment: "#{response.user.name} through #{robot.name} deploy"
+              comment: "#{response.user.name} through #{robot.name} deploy",
+              custom_json: custom_json ? custom_json.to_json : nil
             })
             response.reply(":running_dog: 開始執行 #{deploy_item['name']} 的佈署...")
           elsif deploy_item['type'] == 'jenkins'
