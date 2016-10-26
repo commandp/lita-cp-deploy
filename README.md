@@ -21,7 +21,6 @@ DEPLOY_CONFIG= '{
     "name": "AWS OpsWorks Staging API",
     "short_name": "g stg api",
     "region": "ap-northeast-1", // optional
-    "layer_ids": ["xxx"], // optional
     "type": "aws",
     "stack_id": "xxx",
     "app_id": "xxx"

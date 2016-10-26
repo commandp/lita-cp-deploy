@@ -51,10 +51,9 @@ module Lita
               custom_json: custom_json ? custom_json.to_json : nil
             }
 
-            deployment_configuration['LayerIds'] = deploy_item['layer_ids'] if deploy_item['layer_ids']
             resp = opsworks.create_deployment(deployment_configuration)
 
-            responsereply(":running_dog: 開始執行 #{deploy_item['name']} 的佈署...")
+            response.reply(":running_dog: 開始執行 #{deploy_item['name']} 的佈署...")
           elsif deploy_item['type'] == 'jenkins'
             trigger_url = deploy_item['TriggerURL']
             trigger_url += "&REVISION=#{brunch}" if brunch
