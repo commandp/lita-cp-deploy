@@ -36,7 +36,7 @@ module Lita
             custom_json = nil
             if brunch
               app_name = opsworks.describe_apps(app_ids: [deploy_item['app_id']])[0][0].shortname
-              custom_json = "{\"deploy\":{\"#{app_name}\":{\"scm\":{\"revision\":\"#{brunch}\"}}}}"
+              custom_json = "{\"revision\":\"#{brunch}\",\"deploy\":{\"#{app_name}\":{\"scm\":{\"revision\":\"#{brunch}\"}}}}"
               custom_json = JSON.parse(custom_json)
             end
 
