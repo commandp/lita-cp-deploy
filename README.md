@@ -19,19 +19,20 @@ AWS_SECRET_ACCESS_KEY=xxxxx
 DEPLOY_CONFIG= '{
   "deploy_itams": [{
     "name": "AWS OpsWorks Staging API",
-    "short_name": "g stg api", 
-    "type": "aws", 
+    "short_name": "g stg api",
+    "region": "ap-northeast-1", // optional
+    "type": "aws",
     "stack_id": "xxx",
     "app_id": "xxx"
-  }, 
+  },
   {
     "name": "China Staging Web",
-    "short_name": "c stg web", 
-    "type": "jenkins", 
-    "user": "xiii", 
+    "short_name": "c stg web",
+    "type": "jenkins",
+    "user": "xiii",
     "password": "xxx",
     "TriggerURL": "http://jenkins/job/run_deploy/buildWithParameters?token=xxx&cause=xxx"
-  } 
+  }
 }'
 ```
 

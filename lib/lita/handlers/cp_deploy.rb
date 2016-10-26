@@ -28,7 +28,7 @@ module Lita
 
           if deploy_item['type'] == 'aws'
             opsworks = Aws::OpsWorks::Client.new(
-              region: ENV['AWS_REGION'],
+              region: deploy_item['region'] || ENV['AWS_REGION'],
               access_key_id: ENV['AWS_ACCESS_KEY'],
               secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
             )
