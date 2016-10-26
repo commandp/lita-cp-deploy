@@ -40,7 +40,7 @@ module Lita
               custom_json = JSON.parse(custom_json)
             end
 
-            resp = opsworks.create_deployment({
+            deployment_configuration = {
               stack_id: deploy_item['stack_id'],
               app_id: deploy_item['app_id'],
               command: {
@@ -50,7 +50,11 @@ module Lita
               comment: "#{response.user.name} through #{robot.name} deploy",
               custom_json: custom_json ? custom_json.to_json : nil
             })
-            response.reply(":running_dog: 開始執行 #{deploy_item['name']} 的佈署...")
+
+            deployment_configuration['LayerIds'] = deploy_item['layer_ids'] if deploy_item['layer_ids']
+            resp = opsworks.create_deployment(deployment_configuration)
+
+            responsereply(":running_dog: 開始執行 #{deploy_item['name']} 的佈署...")
           elsif deploy_item['type'] == 'jenkins'
             trigger_url = deploy_item['TriggerURL']
             trigger_url += "&REVISION=#{brunch}" if brunch
