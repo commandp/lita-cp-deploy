@@ -49,7 +49,7 @@ module Lita
               },
               comment: "#{response.user.name} through #{robot.name} deploy",
               custom_json: custom_json ? custom_json.to_json : nil
-            })
+            }
 
             deployment_configuration['LayerIds'] = deploy_item['layer_ids'] if deploy_item['layer_ids']
             resp = opsworks.create_deployment(deployment_configuration)
