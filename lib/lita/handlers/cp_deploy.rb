@@ -25,54 +25,57 @@ module Lita
         brunch = response.matches.flatten[1]
 
         if deploy_item = find_by_deploy_item(response.matches.flatten[0])
+          begin
+            if deploy_item['type'] == 'aws'
+              opsworks = Aws::OpsWorks::Client.new(
+                region: deploy_item['region'] || ENV['AWS_REGION'],
+                access_key_id: ENV['AWS_ACCESS_KEY'],
+                secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
+              )
 
-          if deploy_item['type'] == 'aws'
-            opsworks = Aws::OpsWorks::Client.new(
-              region: deploy_item['region'] || ENV['AWS_REGION'],
-              access_key_id: ENV['AWS_ACCESS_KEY'],
-              secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
-            )
+              custom_json = nil
+              if brunch
+                app_name = opsworks.describe_apps(app_ids: [deploy_item['app_id']])[0][0].shortname
+                custom_json = "{\"revision\":\"#{brunch}\",\"deploy\":{\"#{app_name}\":{\"scm\":{\"revision\":\"#{brunch}\"}}}}"
+                custom_json = JSON.parse(custom_json)
+              end
 
-            custom_json = nil
-            if brunch
-              app_name = opsworks.describe_apps(app_ids: [deploy_item['app_id']])[0][0].shortname
-              custom_json = "{\"revision\":\"#{brunch}\",\"deploy\":{\"#{app_name}\":{\"scm\":{\"revision\":\"#{brunch}\"}}}}"
-              custom_json = JSON.parse(custom_json)
-            end
+              deployment_configuration = {
+                stack_id: deploy_item['stack_id'],
+                app_id: deploy_item['app_id'],
+                command: {
+                  name: 'deploy',
+                  args: { 'migrate' => ['true'] }
+                },
+                comment: "#{response.user.name} through #{robot.name} deploy",
+                custom_json: custom_json ? custom_json.to_json : nil
+              }
 
-            deployment_configuration = {
-              stack_id: deploy_item['stack_id'],
-              app_id: deploy_item['app_id'],
-              command: {
-                name: 'deploy',
-                args: { 'migrate' => ['true'] }
-              },
-              comment: "#{response.user.name} through #{robot.name} deploy",
-              custom_json: custom_json ? custom_json.to_json : nil
-            }
+              resp = opsworks.create_deployment(deployment_configuration)
 
-            resp = opsworks.create_deployment(deployment_configuration)
+              response.reply(":running_dog: 開始執行 #{deploy_item['name']} 的佈署...")
+            elsif deploy_item['type'] == 'jenkins'
+              trigger_url = deploy_item['TriggerURL']
+              trigger_url += "&REVISION=#{brunch}" if brunch
 
-            response.reply(":running_dog: 開始執行 #{deploy_item['name']} 的佈署...")
-          elsif deploy_item['type'] == 'jenkins'
-            trigger_url = deploy_item['TriggerURL']
-            trigger_url += "&REVISION=#{brunch}" if brunch
+              uri = URI(trigger_url)
 
-            uri = URI(trigger_url)
+              req = Net::HTTP::Get.new(uri)
+              req.basic_auth deploy_item['user'], deploy_item['password']
 
-            req = Net::HTTP::Get.new(uri)
-            req.basic_auth deploy_item['user'], deploy_item['password']
-
-            res = Net::HTTP.start(uri.hostname, uri.port) {|http|
-              http.request(req)
-            }
-            if res.code == "201"
-              response.reply(":running_dog: 開始執行 #{deploy_item['name']} 的佈署...#{brunch}")
+              res = Net::HTTP.start(uri.hostname, uri.port) {|http|
+                http.request(req)
+              }
+              if res.code == "201"
+                response.reply(":running_dog: 開始執行 #{deploy_item['name']} 的佈署...#{brunch}")
+              else
+                response.reply("Error: #{res.code}")
+              end
             else
-              response.reply("Error: #{res.code}")
+              response.reply('Error: item type only ["aws", "http_get"]')
             end
-          else
-            response.reply('Error: item type only ["aws", "http_get"]')
+          rescue Exception => e
+            response.reply(":weary:  Error: #{e}")
           end
         end
       end
